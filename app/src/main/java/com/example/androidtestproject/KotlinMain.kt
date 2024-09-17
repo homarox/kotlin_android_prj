@@ -1,15 +1,13 @@
 package com.example.androidtestproject
 
 import com.example.androidtestproject.coroutineexample.CoroutineBasic
-import io.mockk.spyk
-import org.junit.Test
 
-class CoroutineBasicTest {
-    @Test
-    fun basicCoroutine() {
+fun main() {
 //        CoroutineBasic.basicCoroutine()
 //        CoroutineBasic.checkCoroutineScope()
 //        CoroutineBasic.channelBasic()
-        CoroutineBasic.firstCorountine()
-    }
+//        CoroutineBasic.firstCorountine()
+//        CoroutineBasic.testJobCorountine()
+//        CoroutineBasic.testAsyncAwait()
+    CoroutineBasic.testParentScope()
 }
