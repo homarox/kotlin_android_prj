@@ -1,5 +1,8 @@
 package com.example.androidtestproject.kotlinOriginal.coroutine
 
+import com.example.androidtestproject.kotlinOriginal.ClassHelper.showCurrentFunctionName
+import com.example.androidtestproject.kotlinOriginal.ClassHelper.showSubFunctionName
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
@@ -17,13 +21,6 @@ import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
 object The001CoroutineBasic {
-    private fun showCurrentFunctionName() {
-        println(">> Function Testing: ${Thread.currentThread().stackTrace[2].methodName} <<")
-    }
-
-    private fun showSubFunctionName(string: String) {
-        println("\n> $string")
-    }
 
     /** Bloc launch {} là một coroutine builder. Nó phóng một coroutine chạy đồng thời (concurrently)
      * với các phần code còn lại. Đó là lý do từ "Hello" được print ra đầu tiên.
@@ -181,8 +178,8 @@ object The001CoroutineBasic {
      * printOne() rồi mới chạy tiếp hàm printTwo() , sau đó print ra tổng 2 số đó. Ở đây mình sử dụng hàm
      * measureTimeMillis để đo kết quả thực hiện bài toán này khi sử dụng 1 coroutine duy nhất.
      *
-     * Ngoài 2 thằng dùng để launch coroutine mà mình đã biết là runBlocking{ } và GlobalScope.launch{ }, 2 thằng này nó return về kiểu Job.
-     * Nay mình sẽ biết thêm một thằng mới cũng để launch coroutine mà không return về kiểu Job nữa, đó là async{ } .
+     * Ngoài 2 thằng dùng để launch coroutine mà mình đã biết là runBlocking{} và GlobalScope.launch{}, 2 thằng này nó return về kiểu Job.
+     * Nay mình sẽ biết thêm một thằng mới cũng để launch coroutine mà không return về kiểu Job nữa, đó là async{} .
      * */
     fun runBlockingForSequentially04() {
         showCurrentFunctionName()
@@ -207,7 +204,7 @@ object The001CoroutineBasic {
         return 20
     }
 
-    /**-- Thứ nhất: async { } nó cũng như runBlocking { } hay launch { } vì nó cũng được để launch 1 coroutine.
+    /**-- Thứ nhất: async {} nó cũng như runBlocking {} hay launch {} vì nó cũng được để launch 1 coroutine.
      * Điểm khác biệt là khi sử dụng async để launch 1 coroutine thì coroutine đó cho phép bạn return về 1 giá trị kiểu
      * Int , String , Unit , ... kiểu gì cũng được còn 2 thằng kia thì luôn return kiểu Job mà thằng Job này chỉ có thể quản lý
      * lifecycle của coroutine chứ không mang được giá trị kết quả gì (Job does not carry any resulting value).
@@ -249,11 +246,11 @@ object The001CoroutineBasic {
         }
     }
 
-    /**- Tất cả coroutine builder mà trong các bài trước mình đã giới thiệu như launch{ } hay async{ } đều là những
-     * extension function của lớp CoroutineScope. Chính vì vậy bạn không thể gọi các hàm launch { } và async { } bên
-     * ngoài một CoroutineScope được. Riêng runBlocking{ } thì không phải là extension function của CoroutineScope
+    /**- Tất cả coroutine builder mà trong các bài trước mình đã giới thiệu như launch{} hay async{} đều là những
+     * extension function của lớp CoroutineScope. Chính vì vậy bạn không thể gọi các hàm launch {} và async {} bên
+     * ngoài một CoroutineScope được. Riêng runBlocking{} thì không phải là extension function của CoroutineScope
      * mà nó nhận CoroutineScope như một tham số truyền vào nên nó thể được gọi ngoài CoroutineScope.
-     * - Bản thân runBlocking{ } nhờ nhận CoroutineScope như 1 param nên nó tạo ra 1 scope để có thể chạy được các coroutine
+     * - Bản thân runBlocking{} nhờ nhận CoroutineScope như 1 param nên nó tạo ra 1 scope để có thể chạy được các coroutine
      * bên trong đó.
      * - Vậy hãy ghi nhớ, không thể launch 1 coroutine nếu nó không có scope. Hay nói cách khác,
      * ngoài vùng CoroutineScope thì không thể launch coroutine nào cả.
@@ -261,7 +258,7 @@ object The001CoroutineBasic {
      * -> Khi một coroutine A được phóng trong CoroutineScope của một coroutine B khác thì A là con của B.
      * Coroutine con sẽ sử dụng scope và context của coroutine cha. Nếu coroutine con đó được khai báo trong 1 scope riêng
      * với context riêng thì nó sẽ ưu tiên sử dụng scope đó thay vì của cha nó.
-     * -> Nay chúng ta đã biết thêm một coroutine builder nữa là coroutineScope{ }. Nó cũng chạy tuần tự như runBlocking{ } vậy,
+     * -> Nay chúng ta đã biết thêm một coroutine builder nữa là coroutineScope{}. Nó cũng chạy tuần tự như runBlocking{} vậy,
      * chỉ khác là nó là một suspend function nên chỉ có thể tạo ra bên trong một suspend function khác hoặc trong một coroutine scope.
      * -> Khi coroutine cha bị hủy, tất cả các con của nó cũng bị hủy theo.
      * Chúng ta đã biết khi cancel coroutine cha thì tất cả coroutine con bị cancel. Tuy nhiên nếu coroutine con đó có
@@ -310,5 +307,62 @@ object The001CoroutineBasic {
             delay(1000) // delay a second to see what happens
             println("main: Who has survived request cancellation?")
         }
+    }
+
+    /** launch{} gặp Exception thì throw luôn, còn async{} khi gặp Exception thì nó đóng gói Exception đó
+     *  vào biến deferred. Chỉ khi biến deferred này gọi hàm await() thì Exception mới được throw ra.
+     * */
+    @OptIn(DelicateCoroutinesApi::class)
+    fun exceptionInCoroutine07() {
+        showCurrentFunctionName()
+
+        showSubFunctionName("understand Coroutine exception")
+        runBlocking {
+            GlobalScope.launch {
+                println("Throwing exception from launch")
+                throw IndexOutOfBoundsException()
+                println("Unreached")
+            }
+
+            val deferred = GlobalScope.async {
+                println("Throwing exception from async")
+                throw ArithmeticException()
+                println("Unreached")
+            }
+//            deferred.await() // ArithmeticException đã được throw ra khi gặp hàm await()
+        }
+
+        showSubFunctionName("CoroutineExceptionHandler")
+        /** CoroutineExceptionHandler được sử dụng như một generic catch block của tất cả coroutine.
+         * Exception nếu xảy ra sẽ được bắt và trả về cho một hàm callback là override
+         * fun handleException(context: CoroutineContext, exception: Throwable) và chúng ta sẽ dễ dàng log hoặc handle exception trong hàm đó.
+         * */
+        runBlocking {
+            val handler = CoroutineExceptionHandler { _, exception ->
+                println("Caught $exception")
+            }
+            val job = GlobalScope.launch(handler) {
+                throw AssertionError()
+            }
+            val deferred = GlobalScope.async(handler) {
+                throw ArithmeticException() // Nothing will be printed, relying on user to call deferred.await()
+                println("Unreached")
+            }
+            joinAll(job, deferred)
+
+            /** Chúng ta thấy AssertionError trong khối launch{} đã bị catch và được print ra. Vì chúng ta không gọi deferred.await()
+             * nên ArithmeticException trong khối async{} sẽ không xảy ra. Mà cho dù chúng ta có gọi deferred.await()
+             * thì CoroutineExceptionHandler cũng sẽ không catch được Exception này vì CoroutineExceptionHandler không thể
+             * catch được những Exception được đóng gói vào biến Deferred. Vậy nên bạn phải tự catch Exception.
+             * Và thêm một chú ý nữa là CoroutineExceptionHandler cũng không thể catch Exception xảy ra trong khối runBlocking{}
+             * */
+            try {
+                deferred.await()
+                println("Unreached AFTER try-catch")
+            } catch (e: ArithmeticException) {
+                println("Caught ArithmeticException AFTER try-catch")
+            }
+        }
+
     }
 }
