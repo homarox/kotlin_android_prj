@@ -1,15 +1,10 @@
-/*
- * Copyright (c) 2023 All Rights Reserved, Ingenico SA.
- */
-package com.example.androidtestproject
-
 import android.util.Log
 
 /**
  * Define Logcat for all module.
  *
  */
-object LogUtils {
+internal object LogUtils {
 
     private var DEBUG = true
 
@@ -88,7 +83,7 @@ object LogUtils {
             if (msg != null) {
                 d(
                     msg[CLASS_NAME_INDEX],
-                    "[ " + msg[METHOD_NAME_INDEX] + " ] " + content
+                    msg[METHOD_NAME_INDEX] + content
                 )
             }
         }
@@ -105,7 +100,7 @@ object LogUtils {
             if (msg != null) {
                 w(
                     msg[CLASS_NAME_INDEX],
-                    "[ " + msg[METHOD_NAME_INDEX] + " ] " + content
+                    msg[METHOD_NAME_INDEX] + content
                 )
             }
         }
@@ -129,14 +124,15 @@ object LogUtils {
         for (i in stackTraceElements.indices) {
             val ste = stackTraceElements[i]
             if ((ste.className == LogUtils::class.java.name) && (ste.methodName.contains(
-                    TRACE_METHOD
+                    TRACE_METHOD,
+                    ignoreCase = true
                 ))
             ) {
                 index = i + 2 // index for startEndMethodLog method
                 if (index < stackTraceElements.size && stackTraceElements[index].methodName.contains(
-                        START_LOG_METHOD
+                        START_LOG_METHOD, ignoreCase = true
                     ) || index < stackTraceElements.size && stackTraceElements[index].methodName.contains(
-                        END_LOG_METHOD
+                        END_LOG_METHOD, ignoreCase = true
                     )
                 ) {
                     break
@@ -151,7 +147,7 @@ object LogUtils {
         if ((stackTraceElements.size >= index) && (stackTraceElements[index] != null)) {
             return arrayOf(
                 stackTraceElements[index].fileName,
-                stackTraceElements[index].methodName + "[" + stackTraceElements[index].lineNumber + "] "
+                "${stackTraceElements[index].fileName}:${stackTraceElements[index].lineNumber} [${stackTraceElements[index].methodName}] "
             )
         }
         return null
