@@ -1,3 +1,5 @@
+// Refer document: "Cùng học Kotlin Coroutine_12 Parts.pdf"
+
 package com.example.androidtestproject.kotlinOriginal.coroutine
 
 import com.example.androidtestproject.kotlinOriginal.ClassHelper.showCurrentFunctionName
