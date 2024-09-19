@@ -24,7 +24,7 @@ import kotlin.system.measureTimeMillis
 
 object The001CoroutineBasic {
 
-    /** Bloc launch {} là một coroutine builder. Nó phóng một coroutine chạy đồng thời (concurrently)
+    /** Bloc launch{} là một coroutine builder. Nó phóng một coroutine chạy đồng thời (concurrently)
      * với các phần code còn lại. Đó là lý do từ "Hello" được print ra đầu tiên.
      * GlobalScope là coroutine scope. Chúng ta không thể launch một coroutine nếu nó không có scope.
      * Hàm delay() nhìn thì có vẻ giống hàm Thread.sleep() nhưng chúng rất khác nhau.
@@ -111,7 +111,7 @@ object The001CoroutineBasic {
                 try {
                     var nextPrintTime = startTime
                     var i = 0
-//                while (i < 5) {
+//                while (i < 5){
                     // ! quá trình hủy bỏ coroutine có tính hợp tác (Coroutine cancellation is cooperative).
                     // Một coroutine khi bị cancel thì nó sẽ chỉ set lại một property có tên là isActive trong đối tượng Job từ true thành false
                     // (job.isActive = false), còn tiến trình của nó đang chạy thì sẽ vẫn chạy bất chấp cho đến hết mà không bị dừng lại.
@@ -206,7 +206,7 @@ object The001CoroutineBasic {
         return 20
     }
 
-    /**-- Thứ nhất: async {} nó cũng như runBlocking {} hay launch {} vì nó cũng được để launch 1 coroutine.
+    /**-- Thứ nhất: async{} nó cũng như runBlocking{} hay launch{} vì nó cũng được để launch 1 coroutine.
      * Điểm khác biệt là khi sử dụng async để launch 1 coroutine thì coroutine đó cho phép bạn return về 1 giá trị kiểu
      * Int , String , Unit , ... kiểu gì cũng được còn 2 thằng kia thì luôn return kiểu Job mà thằng Job này chỉ có thể quản lý
      * lifecycle của coroutine chứ không mang được giá trị kết quả gì (Job does not carry any resulting value).
@@ -249,7 +249,7 @@ object The001CoroutineBasic {
     }
 
     /**- Tất cả coroutine builder mà trong các bài trước mình đã giới thiệu như launch{} hay async{} đều là những
-     * extension function của lớp CoroutineScope. Chính vì vậy bạn không thể gọi các hàm launch {} và async {} bên
+     * extension function của lớp CoroutineScope. Chính vì vậy bạn không thể gọi các hàm launch{} và async{} bên
      * ngoài một CoroutineScope được. Riêng runBlocking{} thì không phải là extension function của CoroutineScope
      * mà nó nhận CoroutineScope như một tham số truyền vào nên nó thể được gọi ngoài CoroutineScope.
      * - Bản thân runBlocking{} nhờ nhận CoroutineScope như 1 param nên nó tạo ra 1 scope để có thể chạy được các coroutine
