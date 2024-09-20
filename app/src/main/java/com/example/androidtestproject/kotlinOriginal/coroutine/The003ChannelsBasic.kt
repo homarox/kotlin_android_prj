@@ -4,7 +4,6 @@ package com.example.androidtestproject.kotlinOriginal.coroutine
 
 import com.example.androidtestproject.kotlinOriginal.ClassHelper.showCurrentFunctionName
 import com.example.androidtestproject.kotlinOriginal.ClassHelper.showSubFunctionName
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -17,17 +16,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlin.coroutines.coroutineContext
 
-object The003ChannelsMutexBasic {
+object The003ChannelsBasic {
     /**! Channels khá giống với Flow nó cũng giúp chúng ta transfer một luồng giá trị (stream of values).
      * Channels khá giống với BlockingQueue, tức là nó cũng hoạt động như một Queue (hàng đợi) là FIFO (First In First Out)
      * Điểm khác nhau ở đây là BlockingQueue nó sử dụng 2 hàm put (thêm vào queue) và hàm take (lấy từ queue ra) và 2 hàm này là chạy blocking
      * còn Channels sử dụng 2 hàm send (tương tự hàm put) và receive (tương tự hàm take) và 2 hàm này là suspend function
      *
-     ** Channels vs Flow (Hot & Cold)
+     *! Channels vs Flow (Hot & Cold)
      * Như các bạn đã biết Flow là một nguồn dữ liệu lạnh (cold streams). Điều đó có nghĩa là code bên trong flow{} sẽ không chạy cho đến khi Flow gọi hàm collect.
      * Như vậy nếu ko có ai nhận vé thì nó sẽ ko in vé.
      * Còn Channels thì khác, như mình đã nói ở trên thì khi channel send nó sẽ tạm suspend và chờ đến khi có ai đó receive thì nó mới resume và tiếp tục send.
@@ -274,54 +270,5 @@ object The003ChannelsMutexBasic {
             }
             sender.cancel() // cancel sender coroutine
         }
-    }
-
-    /** Trong ngữ cảnh coroutines, mutex (viết tắt của mutual exclusion) là một cơ chế đồng bộ hóa được sử dụng để đảm bảo rằng
-     * chỉ có một coroutine có thể truy cập vào một tài nguyên chia sẻ tại một thời điểm. Điều này rất quan trọng khi nhiều coroutine
-     * cùng thao tác trên cùng một dữ liệu, nhằm tránh các vấn đề về race condition (điều kiện tranh chấp) hoặc sự không nhất quán của dữ liệu.
-     * Vì vậy, mutex trong coroutines là công cụ quan trọng để quản lý tài nguyên chia sẻ một cách an toàn trong môi trường lập trình đồng thời.
-     ** https://medium.com/mobile-app-development-publication/mutex-for-coroutines-5f4a4ca60763
-     * */
-    fun mutexControl06() {
-        val mutex = Mutex() // Create a Mutex to control access
-        var sharedResource = 0 // Shared resource that multiple coroutines will access
-        runBlocking {
-            // Launch 3 coroutines to increment the shared resource
-            // Each coroutine increments 10 times
-            val times = 10
-            val job1 = launch(CoroutineName("job_1")) {
-                repeat(times) {
-                    sharedResource = incrementResource(mutex, sharedResource)
-                }
-            }
-            val job2 = launch(CoroutineName("job_2")) {
-                repeat(times) {
-                    sharedResource = incrementResource(mutex, sharedResource)
-                }
-            }
-            val job3 = launch(CoroutineName("job_3")) {
-                repeat(times) {
-                    sharedResource = incrementResource(mutex, sharedResource)
-                }
-            }
-
-            // Wait for all coroutines to finish
-            job2.join()
-            job1.join()
-            job3.join()
-
-            println("Final value of sharedResource: $sharedResource")
-        }
-    }
-
-    // Function to increment the shared resource
-    private suspend fun incrementResource(mutex: Mutex, sharedResource: Int): Int {
-        var localSharedResource = sharedResource
-        // Use withLock to ensure only one coroutine accesses this block at a time
-        mutex.withLock {
-            localSharedResource += 1
-            println("Resource incremented by ${Thread.currentThread().name} - ${coroutineContext[CoroutineName]?.name}: $localSharedResource")
-        }
-        return localSharedResource
     }
 }
