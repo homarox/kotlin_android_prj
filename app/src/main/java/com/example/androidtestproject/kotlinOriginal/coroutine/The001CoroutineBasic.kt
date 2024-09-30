@@ -1,4 +1,5 @@
 // Refer document: "Cùng học Kotlin Coroutine_12 Parts.pdf"
+// Refer document: "Kotlin Coroutines by Tutorials _ 3rd [2022].pdf"
 
 package com.example.androidtestproject.kotlinOriginal.coroutine
 
@@ -35,6 +36,7 @@ object The001CoroutineBasic {
     fun firstCoroutine01() {
         showCurrentFunctionName()
 
+        showSubFunctionName("GlobalScope.launch")
         GlobalScope.launch { // chạy một coroutine
             delay(1000L) // delay 1s nhưng ko làm blocking app
             println("World,") // print từ World ra sau khi hết delay
@@ -42,6 +44,13 @@ object The001CoroutineBasic {
         println("Hello,") // main thread vẫn tiếp tục chạy xuống dòng code này trong khi coroutine vẫn đang bị delay 1s
         Thread.sleep(2000L) // block main thread 2s
         println("Kotlin")
+
+        showSubFunctionName("runBlocking")
+        runBlocking(){
+            println("Hello,")
+            delay(1000L)
+            println("World,")
+        }
     }
 
     /** Các dòng lệnh không nhất thiết phải lúc nào cũng phải thực hiện một cách tuần tự (sequential)
@@ -366,5 +375,51 @@ object The001CoroutineBasic {
             }
         }
 
+    }
+
+    /** The CoroutineStart is the mode in which you can start a coroutine. Options are:
+     * • DEFAULT: Immediately schedules a coroutine for execution according to its context.
+     * • LAZY: Starts coroutine lazily.
+     * • ATOMIC: Same as DEFAULT but cannot be cancelled before it starts.
+     * • UNDISPATCHED: Runs the coroutine until its first suspension point.
+     * */
+    @OptIn(DelicateCoroutinesApi::class)
+    fun dependentJobsInAction08(){
+        showCurrentFunctionName()
+
+        showSubFunctionName("Dependent Jobs in Action")
+        val job1 = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            delay(200)
+            println("Pong")
+            delay(200)
+        }
+        GlobalScope.launch {
+            delay(200)
+            println("Ping")
+            job1.join() // start the LAZY job
+            println("Ping")
+            delay(200)
+        }
+        Thread.sleep(1000)
+
+        showSubFunctionName("Managing Job Hierarchy")
+        with(GlobalScope) {
+            val parentJob = launch {
+                delay(200)
+                println("I’m the parent")
+                delay(200)
+            }
+            launch(context = parentJob) {
+                delay(200)
+                println("I’m a child")
+                delay(200)
+            }
+            if (parentJob.children.iterator().hasNext()) {
+                println("The Job has children!")
+            } else {
+                println("The Job has NO children")
+            }
+            Thread.sleep(1000)
+        }
     }
 }
