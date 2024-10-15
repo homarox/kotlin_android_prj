@@ -24,8 +24,7 @@ import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
 object The001CoroutineBasic {
-
-    /** Bloc launch{} là một coroutine builder. Nó phóng một coroutine chạy đồng thời (concurrently)
+    /** Block launch{} là một coroutine builder. Nó phóng một coroutine chạy đồng thời (concurrently)
      * với các phần code còn lại. Đó là lý do từ "Hello" được print ra đầu tiên.
      * GlobalScope là coroutine scope. Chúng ta không thể launch một coroutine nếu nó không có scope.
      * Hàm delay() nhìn thì có vẻ giống hàm Thread.sleep() nhưng chúng rất khác nhau.
@@ -382,6 +381,11 @@ object The001CoroutineBasic {
      * • LAZY: Starts coroutine lazily.
      * • ATOMIC: Same as DEFAULT but cannot be cancelled before it starts.
      * • UNDISPATCHED: Runs the coroutine until its first suspension point.
+     *
+     *! A Job is a handle to the coroutine in the queue.
+     *  When you launch a coroutine, you create a Job, which is always in the New state. It then goes directly into the Active state by default
+     *  unless you’ve supplied the LAZY. CoroutineStart parameter in the coroutine builder you’ve used.
+     *  You can also move a Job from the New to the Active state using start or join.
      * */
     @OptIn(DelicateCoroutinesApi::class)
     fun dependentJobsInAction08(){
@@ -421,5 +425,40 @@ object The001CoroutineBasic {
             }
             Thread.sleep(1000)
         }
+
+        showSubFunctionName("Using Standard Functions With Coroutines")
+        var isDoorOpen = false
+        println("Unlocking the door... please wait.")
+        GlobalScope.launch {
+            delay(3000)
+            isDoorOpen = true
+        }
+        GlobalScope.launch {
+            repeat(4) {
+                println("Trying to open the door... $it")
+                delay(800)
+                if (isDoorOpen) {
+                    println("Opened the door!")
+                } else {
+                    println("The door is still locked")
+                }
+            }
+        }
+        Thread.sleep(5000)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun checkJobThread09(){
+        showCurrentFunctionName()
+        GlobalScope.launch {
+            val bgThreadName = Thread.currentThread().name
+            println("I’m Job 1 in thread $bgThreadName")
+            delay(200)
+            GlobalScope.launch(Dispatchers.Main) {
+                val uiThreadName = Thread.currentThread().name
+                println("I’m Job 2 in thread $uiThreadName")
+            }
+        }
+        Thread.sleep(1000)
     }
 }

@@ -9,4 +9,8 @@ object ClassHelper {
     fun showSubFunctionName(string: String) {
         println("\n> $string")
     }
+
+    private fun showCurrentThreadName(): String {
+        return Thread.currentThread().name
+    }
 }
