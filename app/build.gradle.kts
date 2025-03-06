@@ -53,6 +53,7 @@ android {
 dependencies {
 
     implementation(libs.kotlinStdlib)
+    implementation(libs.kotlinxSerialization)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
